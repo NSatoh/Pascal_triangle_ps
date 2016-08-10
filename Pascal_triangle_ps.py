@@ -259,11 +259,6 @@ def Pascal_triangle_coloring(row, modulo,
 
 if __name__ == '__main__':
 
-    file_name = 'fig02-01_Pascal_triangle_circle_16.tex'
-
-    tikz_head = r'\begin{tikzpicture}[scale=0.8, every node/.style={scale=0.7}]' + '\n'
-    tikz_foot = r'\end{tikzpicture}'
-
     n = 300
     modulo = 5
     shape = 'circle'
