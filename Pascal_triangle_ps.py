@@ -213,11 +213,7 @@ def pascal_triangle_coloring(row, modulo,
 
     ps_footer = ['showpage']
 
-    return "\n".join([
-        "\n".join(ps_header),
-        "\n".join(ps_body),
-        "\n".join(ps_footer)
-    ])
+    return "\n".join(ps_header + ps_body + ps_footer)
 
 
 if __name__ == '__main__':
@@ -231,10 +227,9 @@ if __name__ == '__main__':
     else:
         bg = ''
     out_directory = './out'
-    file_name = 'Pascal_triangle_mod{modulo}_{n}_{shape}{bg}.ps'.format(modulo=modulo, n=n,
-                                                                        shape=shape, bg=bg)
+    file_name = 'Pascal_triangle_mod{modulo}_{n}_{shape}{bg}.ps'.format(modulo=modulo, n=n, shape=shape, bg=bg)
     if not os.path.isdir(out_directory):
-      os.mkdir(out_directory)
+        os.mkdir(out_directory)
     f = open(out_directory + '/' + file_name, 'w')
 
     ps = pascal_triangle_coloring(n, modulo,
