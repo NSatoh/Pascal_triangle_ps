@@ -10,7 +10,7 @@ def gen_nCr_mod(n, modulo):
     :param int n:
     :param int modulo:
     :rtype: list[list[int]]
-    :return: [[C(0,0)], [C(1,0), C(0,1)], ..., [C(n,0), C(n,1), ..., C(n,n)]]
+    :return: [[C(0,0)], [C(1,0), C(1,1)], ..., [C(n,0), C(n,1), ..., C(n,n)]]
     (nCr = output, then nCr[n][r] is C(n,r) )
     """
     nCr = [[1]]
@@ -50,7 +50,7 @@ def pascal_triangle_coloring(row, modulo,
                              print_no_color=True,
                              print_sample=True, sample_scale=10):
     """
-    Generate PS src
+    Generate PostScript src
 
     :param int row: the number of rows of the triangle
     :param int modulo: modulo for coloring
@@ -68,60 +68,58 @@ def pascal_triangle_coloring(row, modulo,
     :param bool print_sample: if True, output the color samples
     :param int sample_scale: length of edge of the color sample rectangles
     :rtype: str
-    :return: postscript source
+    :return: PostScript source
     """
 
     # postscript の仕様では, 1pt = 1/72 インチ
     # A4 だと, 0 < x < 595pt, 0 < y < 842pt くらい
     # そしてよくわからないが，座標では 左下(0,0) -- (501,709)右上 くらい
-    ps_head =  r'%!PS-Adobe-3.0' + '\n'
-    ps_head += r'/mm { 2.834646 mul } def  % inch -> mm' + '\n'
-    ps_head += r'newpath' + '\n'
+    ps_header =  r'%!PS-Adobe-3.0' + '\n'
+    ps_header += r'/mm { 2.834646 mul } def  % inch -> mm' + '\n'
+    ps_header += r'newpath' + '\n'
 
-    ps_head += r'/gray {0.5 setgray } def' + '\n'
+    ps_header += r'/gray {0.5 setgray } def' + '\n'
 
     for color in color_list:
-        ps_head += color.as_ps_form() + '\n'
-
-    rcomment = '%'
-    ccomment = '%'
+        ps_header += color.as_ps_form() + '\n'
 
     if shape == 'rectangle':
-        rcomment = ''
+        ps_header += '/colorbox {\n'
+        ps_header += '  %%-- rectangle --\n'
+        ps_header += '  moveto\n'
+        ps_header += '  0 {s} rlineto\n'.format(s=scale * yscale)
+        ps_header += '  {ss} 0 rlineto\n'.format(ss=2 * scale)
+        ps_header += '  0 -{s} rlineto\n'.format(s=scale * yscale)
+        ps_header += '  fill\n'
+        ps_header += '} def\n'
+        ps_header += '/nocolorbox {\n'
+        ps_header += '  %%-- rectangle --\n'
+        ps_header += '  moveto\n'
+        ps_header += '  0 {s} rlineto\n'.format(s=scale * yscale)
+        ps_header += '  {ss} 0 rlineto\n'.format(ss=2 * scale)
+        ps_header += '  0 -{s} rlineto\n'.format(s=scale * yscale)
+        ps_header += '  stroke\n'
+        ps_header += '} def\n'
     elif shape == 'circle':
-        ccomment = ''
+        ps_header += '/colorbox {\n'
+        ps_header += '  %%-- circle --\n'
+        ps_header += '  {s} 0 360 arc\n'.format(s=scale)
+        ps_header += '  fill\n'
+        ps_header += '} def\n'
+        ps_header += '/nocolorbox {\n'
+        ps_header += '  %%-- circle --\n'
+        ps_header += '  {s} 0 360 arc\n'.format(s=scale)
+        ps_header += '  stroke\n'
+        ps_header += '} def\n'
+    else:
+        pass
 
-    ps_head += '/colorbox {\n'
-    ps_head += '  %%-- rectangle --\n'
-    ps_head += '  {rcomment}moveto\n'.format(rcomment=rcomment)
-    ps_head += '  {rcomment}0 {s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
-    ps_head += '  {rcomment}{ss} 0 rlineto\n'.format(ss=2*scale, rcomment=rcomment)
-    ps_head += '  {rcomment}0 -{s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
-    ps_head += '  {rcomment}fill\n'.format(rcomment=rcomment)
-    ps_head += '  %%-- circle --\n'
-    ps_head += '  {ccomment}{s} 0 360 arc\n'.format(s=scale, ccomment=ccomment)
-    ps_head += '  {ccomment}fill\n'.format(ccomment=ccomment)
-    ps_head += '} def\n'
-
-    ps_head += '/colorsample {\n'
-    ps_head += '  0 {s} rlineto\n'.format(s=sample_scale//2)
-    ps_head += '  {ss} 0 rlineto\n'.format(ss=2*sample_scale)
-    ps_head += '  0 -{s} rlineto\n'.format(s=sample_scale//2)
-    ps_head += '  fill\n'
-    ps_head += '} def\n'
-
-    ps_head += '/nocolorbox {\n'
-    ps_head += '  %%-- rectangle --\n'
-    ps_head += '  {rcomment}moveto\n'.format(rcomment=rcomment)
-    ps_head += '  {rcomment}0 {s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
-    ps_head += '  {rcomment}{ss} 0 rlineto\n'.format(ss=2*scale, rcomment=rcomment)
-    ps_head += '  {rcomment}0 -{s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
-    ps_head += '  {rcomment}stroke\n'.format(rcomment=rcomment)
-    ps_head += '  %%-- circle --\n'
-    ps_head += '  {ccomment}{s} 0 360 arc\n'.format(s=scale, ccomment=ccomment)
-    ps_head += '  {ccomment}stroke\n'.format(ccomment=ccomment)
-    ps_head += '} def\n'
-
+    ps_header += '/colorsample {\n'
+    ps_header += '  0 {s} rlineto\n'.format(s=sample_scale//2)
+    ps_header += '  {ss} 0 rlineto\n'.format(ss=2*sample_scale)
+    ps_header += '  0 -{s} rlineto\n'.format(s=sample_scale//2)
+    ps_header += '  fill\n'
+    ps_header += '} def\n'
 
     ps_body  = 'newpath\n'
     ps_body += '{lw} setlinewidth\n'.format(lw=line_width)
@@ -206,8 +204,8 @@ def pascal_triangle_coloring(row, modulo,
                     ps_body += 'black {x:<8.5f} {y:8<.5f} nocolorbox\n'.format(x=(-(i+1)+2*j)*scale,
                                                                  y=-i*scale*yscale)
 
-    ps_foot = 'showpage'
-    return ps_head + ps_body + ps_foot
+    ps_footer = 'showpage'
+    return ps_header + ps_body + ps_footer
 
 
 if __name__ == '__main__':
