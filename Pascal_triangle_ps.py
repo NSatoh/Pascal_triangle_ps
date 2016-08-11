@@ -76,16 +76,13 @@ def pascal_triangle_coloring(row, modulo,
     # そしてよくわからないが，座標では 左下(0,0) -- (501,709)右上 くらい
     ps_header =  r'%!PS-Adobe-3.0' + '\n'
     ps_header += r'/mm { 2.834646 mul } def  % inch -> mm' + '\n'
-    ps_header += r'newpath' + '\n'
-
-    ps_header += r'/gray {0.5 setgray } def' + '\n'
 
     for color in color_list:
         ps_header += color.as_ps_form() + '\n'
 
     if shape == 'rectangle':
         ps_header += '/colorbox {\n'
-        ps_header += '  %%-- rectangle --\n'
+        ps_header += '  %-- rectangle --\n'
         ps_header += '  moveto\n'
         ps_header += '  0 {s} rlineto\n'.format(s=scale * yscale)
         ps_header += '  {ss} 0 rlineto\n'.format(ss=2 * scale)
@@ -93,7 +90,7 @@ def pascal_triangle_coloring(row, modulo,
         ps_header += '  fill\n'
         ps_header += '} def\n'
         ps_header += '/nocolorbox {\n'
-        ps_header += '  %%-- rectangle --\n'
+        ps_header += '  %-- rectangle --\n'
         ps_header += '  moveto\n'
         ps_header += '  0 {s} rlineto\n'.format(s=scale * yscale)
         ps_header += '  {ss} 0 rlineto\n'.format(ss=2 * scale)
@@ -102,12 +99,12 @@ def pascal_triangle_coloring(row, modulo,
         ps_header += '} def\n'
     elif shape == 'circle':
         ps_header += '/colorbox {\n'
-        ps_header += '  %%-- circle --\n'
+        ps_header += '  %-- circle --\n'
         ps_header += '  {s} 0 360 arc\n'.format(s=scale)
         ps_header += '  fill\n'
         ps_header += '} def\n'
         ps_header += '/nocolorbox {\n'
-        ps_header += '  %%-- circle --\n'
+        ps_header += '  %-- circle --\n'
         ps_header += '  {s} 0 360 arc\n'.format(s=scale)
         ps_header += '  stroke\n'
         ps_header += '} def\n'
