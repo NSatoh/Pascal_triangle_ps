@@ -20,7 +20,7 @@ def gen_nCr_mod(n, modulo):
     return nCr
 
 
-#-- color settings for PS -------------------------------------
+# -- color settings for PS -------------------------------------
 class PsColor:
 
     _PS_COLOR_FORMAT = '/{name} {{{r} {g} {b} setrgbcolor }} def'
@@ -31,41 +31,38 @@ class PsColor:
         self.g = g
         self.b = b
 
-    def PS_form(self):
+    def as_ps_form(self):
         return self._PS_COLOR_FORMAT.format(name=self.name,
                                             r=self.r,
                                             g=self.g,
                                             b=self.b)
 
-RED     = PsColor(name='red',    r=1, g=0, b=0)
-BLUE    = PsColor(name='blue',   r=0, g=0, b=1)
-GREEN   = PsColor(name='green',  r=0, g=1, b=0)
-MAGENTA = PsColor(name='magenta',r=1, g=0, b=1)
-CYAN    = PsColor(name='cyan',   r=0, g=1, b=1)
-YELLOW  = PsColor(name='yellow', r=1, g=1, b=0)
-HOTPINK = PsColor(name='hotpink',r=1, g=0.412, b=0.706)
-TEAL    = PsColor(name='teal',   r=0, g=0.5, b=0.5)
+RED         = PsColor(name='red', r=1, g=0, b=0)
+BLUE        = PsColor(name='blue', r=0, g=0, b=1)
+GREEN       = PsColor(name='green', r=0, g=1, b=0)
+MAGENTA     = PsColor(name='magenta', r=1, g=0, b=1)
+CYAN        = PsColor(name='cyan', r=0, g=1, b=1)
+YELLOW      = PsColor(name='yellow', r=1, g=1, b=0)
+HOTPINK     = PsColor(name='hotpink', r=1, g=0.412, b=0.706)
+TEAL        = PsColor(name='teal', r=0, g=0.5, b=0.5)
 FORESTGREEN = PsColor(name='forestgreen', r=0.133, g=0.545, b=0.133)
-DARKORCHID = PsColor(name='darkorchid', r=0.6, g=0.196, b=0.8)
-SKYBLUE = PsColor(name='skyblue', r=0.529, g=0.808, b=0.922)
-SLATEBLUE = PsColor(name='slateblue', r=0, g=0.5, b=1)
-DARKORANGE = PsColor(name='darkorange', r=1, g=0.549, b=0)
-BLACK   = PsColor(name='black',  r=0, g=0, b=0)
-GRAY80   = PsColor(name='gray80',  r=0.8, g=0.8, b=0.8)
+DARKORCHID  = PsColor(name='darkorchid', r=0.6, g=0.196, b=0.8)
+SKYBLUE     = PsColor(name='skyblue', r=0.529, g=0.808, b=0.922)
+SLATEBLUE   = PsColor(name='slateblue', r=0, g=0.5, b=1)
+DARKORANGE  = PsColor(name='darkorange', r=1, g=0.549, b=0)
+BLACK       = PsColor(name='black',  r=0, g=0, b=0)
+GRAY80      = PsColor(name='gray80',  r=0.8, g=0.8, b=0.8)
 
 COLORS = [RED, GREEN, YELLOW, SLATEBLUE, GREEN, MAGENTA, CYAN,
           HOTPINK, TEAL, FORESTGREEN, DARKORCHID, SKYBLUE,
           BLACK]
 
 
-# tmp
-COLORING_FLAGS = [False] + [True]*12
-
-def Pascal_triangle_coloring(row, modulo,
+def pascal_triangle_coloring(row, modulo,
                              shape='rectangle',
                              scale=0.7, yscale=3**0.5, line_width=0.1,
                              color_list=COLORS,
-                             coloring_flags=COLORING_FLAGS,
+                             coloring_flags=[False] + [True]*12,
                              print_background_triangle=False,
                              print_no_color=True,
                              print_sample=True, sample_scale=10):
@@ -90,14 +87,14 @@ def Pascal_triangle_coloring(row, modulo,
     # postscript の仕様では, 1pt = 1/72 インチ
     # A4 だと, 0 < x < 595pt, 0 < y < 842pt くらい
     # そしてよくわからないが，座標では 左下(0,0) -- (501,709)右上 くらい
-    PS_head =  r'%!PS-Adobe-3.0' + '\n'
-    PS_head += r'/mm { 2.834646 mul } def  % inch -> mm' + '\n'
-    PS_head += r'newpath' + '\n'
+    ps_head =  r'%!PS-Adobe-3.0' + '\n'
+    ps_head += r'/mm { 2.834646 mul } def  % inch -> mm' + '\n'
+    ps_head += r'newpath' + '\n'
 
-    PS_head += r'/gray {0.5 setgray } def' + '\n'
+    ps_head += r'/gray {0.5 setgray } def' + '\n'
 
     for color in color_list:
-        PS_head += color.PS_form() + '\n'
+        ps_head += color.as_ps_form() + '\n'
 
     rcomment = '%'
     ccomment = '%'
@@ -107,123 +104,123 @@ def Pascal_triangle_coloring(row, modulo,
     elif shape == 'circle':
         ccomment = ''
 
-    PS_head += '/colorbox {\n'
-    PS_head += '  %%-- rectangle --\n'
-    PS_head += '  {rcomment}moveto\n'.format(rcomment=rcomment)
-    PS_head += '  {rcomment}0 {s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment) 
-    PS_head += '  {rcomment}{ss} 0 rlineto\n'.format(ss=2*scale, rcomment=rcomment) 
-    PS_head += '  {rcomment}0 -{s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment) 
-    PS_head += '  {rcomment}fill\n'.format(rcomment=rcomment)
-    PS_head += '  %%-- circle --\n'
-    PS_head += '  {ccomment}{s} 0 360 arc\n'.format(s=scale, ccomment=ccomment)
-    PS_head += '  {ccomment}fill\n'.format(ccomment=ccomment)
-    PS_head += '} def\n'
+    ps_head += '/colorbox {\n'
+    ps_head += '  %%-- rectangle --\n'
+    ps_head += '  {rcomment}moveto\n'.format(rcomment=rcomment)
+    ps_head += '  {rcomment}0 {s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
+    ps_head += '  {rcomment}{ss} 0 rlineto\n'.format(ss=2*scale, rcomment=rcomment)
+    ps_head += '  {rcomment}0 -{s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
+    ps_head += '  {rcomment}fill\n'.format(rcomment=rcomment)
+    ps_head += '  %%-- circle --\n'
+    ps_head += '  {ccomment}{s} 0 360 arc\n'.format(s=scale, ccomment=ccomment)
+    ps_head += '  {ccomment}fill\n'.format(ccomment=ccomment)
+    ps_head += '} def\n'
 
-    PS_head += '/colorsample {\n'
-    PS_head += '  0 {s} rlineto\n'.format(s=sample_scale//2) 
-    PS_head += '  {ss} 0 rlineto\n'.format(ss=2*sample_scale) 
-    PS_head += '  0 -{s} rlineto\n'.format(s=sample_scale//2)
-    PS_head += '  fill\n'
-    PS_head += '} def\n'
+    ps_head += '/colorsample {\n'
+    ps_head += '  0 {s} rlineto\n'.format(s=sample_scale//2)
+    ps_head += '  {ss} 0 rlineto\n'.format(ss=2*sample_scale)
+    ps_head += '  0 -{s} rlineto\n'.format(s=sample_scale//2)
+    ps_head += '  fill\n'
+    ps_head += '} def\n'
 
-    PS_head += '/nocolorbox {\n'
-    PS_head += '  %%-- rectangle --\n'
-    PS_head += '  {rcomment}moveto\n'.format(rcomment=rcomment)
-    PS_head += '  {rcomment}0 {s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment) 
-    PS_head += '  {rcomment}{ss} 0 rlineto\n'.format(ss=2*scale, rcomment=rcomment) 
-    PS_head += '  {rcomment}0 -{s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment) 
-    PS_head += '  {rcomment}stroke\n'.format(rcomment=rcomment)
-    PS_head += '  %%-- circle --\n'
-    PS_head += '  {ccomment}{s} 0 360 arc\n'.format(s=scale, ccomment=ccomment)
-    PS_head += '  {ccomment}stroke\n'.format(ccomment=ccomment)
-    PS_head += '} def\n'
+    ps_head += '/nocolorbox {\n'
+    ps_head += '  %%-- rectangle --\n'
+    ps_head += '  {rcomment}moveto\n'.format(rcomment=rcomment)
+    ps_head += '  {rcomment}0 {s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
+    ps_head += '  {rcomment}{ss} 0 rlineto\n'.format(ss=2*scale, rcomment=rcomment)
+    ps_head += '  {rcomment}0 -{s} rlineto\n'.format(s=scale*yscale, rcomment=rcomment)
+    ps_head += '  {rcomment}stroke\n'.format(rcomment=rcomment)
+    ps_head += '  %%-- circle --\n'
+    ps_head += '  {ccomment}{s} 0 360 arc\n'.format(s=scale, ccomment=ccomment)
+    ps_head += '  {ccomment}stroke\n'.format(ccomment=ccomment)
+    ps_head += '} def\n'
 
 
-    PS  = 'newpath\n'
-    PS += '{lw} setlinewidth\n'.format(lw=line_width)
-    PS += '% 原点を, 大体紙の中央一番上へ移動\n'
-    PS += '250 700 translate\n'
+    ps_body  = 'newpath\n'
+    ps_body += '{lw} setlinewidth\n'.format(lw=line_width)
+    ps_body += '% 原点を, 大体紙の中央一番上へ移動\n'
+    ps_body += '250 700 translate\n'
 
-    PS += '%****************** Pascal triangle -- {row} -- [color fill] ******************%\n'.format(row=row)
-    PS += '% mod {modulo}\n'.format(modulo=modulo)
+    ps_body += '%****************** Pascal triangle -- {row} -- [color fill] ******************%\n'.format(row=row)
+    ps_body += '% mod {modulo}\n'.format(modulo=modulo)
 
     color_num = 0
-    color_dict = {}# 直したい
+    color_dict = {}  # 直したい
 
     if print_background_triangle:
         color = color_list[color_num]
-        PS += '% back-ground --> {color}\n'.format(color=color.name)
+        ps_body += '% back-ground --> {color}\n'.format(color=color.name)
         color_dict['back-ground'] = color.name
         color_num += 1
 
     for r in range(modulo):
         if coloring_flags[r]:
             color = color_list[color_num]
-            PS += '% {r} --> {color}\n'.format(r=r, color=color.name)
+            ps_body += '% {r} --> {color}\n'.format(r=r, color=color.name)
             color_dict[r] = color.name
             color_num += 1
         else:
             if print_background_triangle:
-                PS += '% {r} --> back-ground\n'.format(r=r)
+                ps_body += '% {r} --> back-ground\n'.format(r=r)
             else:
-                PS += '% {r} --> no-color\n'.format(r=r)
+                ps_body += '% {r} --> no-color\n'.format(r=r)
 
     if print_sample:
-        PS += '% -- color sample ---------------\n'
-        PS += '/Times-Roman findfont {s} scalefont setfont\n'.format(s=int(sample_scale*0.6))
+        ps_body += '% -- color sample ---------------\n'
+        ps_body += '/Times-Roman findfont {s} scalefont setfont\n'.format(s=int(sample_scale*0.6))
         x = row*scale + sample_scale
         y = 0
         for r in range(modulo):
             if coloring_flags[r]:
                 color = color_dict[r]
-                PS += 'black {x} {y} moveto (:{r}) show\n'.format(x=x+2*sample_scale,
+                ps_body += 'black {x} {y} moveto (:{r}) show\n'.format(x=x+2*sample_scale,
                                                             y=y,
                                                             r=r)
-                PS += '{color} {x} {y} moveto colorsample\n'.format(color=color,
+                ps_body += '{color} {x} {y} moveto colorsample\n'.format(color=color,
                                                                   x=x,y=y)
                 y -= sample_scale
             elif print_background_triangle:
                 color = color_dict['back-ground']
-                PS += 'black {x} {y} moveto (:{r}) show\n'.format(x=x+2*sample_scale,
+                ps_body += 'black {x} {y} moveto (:{r}) show\n'.format(x=x+2*sample_scale,
                                                             y=y,
                                                             r=r)
-                PS += '{color} {x} {y} moveto colorsample\n'.format(color=color,
+                ps_body += '{color} {x} {y} moveto colorsample\n'.format(color=color,
                                                                   x=x,y=y)
                 y -= sample_scale
 
     if print_background_triangle:
-        print_no_color = False # auto setting
+        print_no_color = False  # auto setting
         i, j = 0, 0
-        PS += '{color} {x:<8.5f} {y:8<.5f} moveto\n'.format(color=color_dict['back-ground'],
+        ps_body += '{color} {x:<8.5f} {y:8<.5f} moveto\n'.format(color=color_dict['back-ground'],
                                                                  x=(-(i+1)+2*j)*scale,
                                                                  y=-i*scale*yscale)
 
         i, j = row-1, 0
-        PS += '{x:<8.5f} {y:8<.5f} lineto\n'.format(color=color_dict['back-ground'],
+        ps_body += '{x:<8.5f} {y:8<.5f} lineto\n'.format(color=color_dict['back-ground'],
                                                                  x=(-(i+1)+2*j)*scale,
                                                                  y=-i*scale*yscale)
         i, j = row-1, row-1
-        PS += '{x:<8.5f} {y:8<.5f} lineto\n'.format(color=color_dict['back-ground'],
+        ps_body += '{x:<8.5f} {y:8<.5f} lineto\n'.format(color=color_dict['back-ground'],
                                                                  x=(-(i+1)+2*j)*scale,
                                                                  y=-i*scale*yscale)
-        PS += 'fill\n'
+        ps_body += 'fill\n'
 
-    nCr = gen_nCr_mod(row,modulo)
+    nCr = gen_nCr_mod(row, modulo)
 
     for i in range(row):
         for j in range(i+1):
-            iCj = nCr[i][j]# % modulo
+            iCj = nCr[i][j]
             if coloring_flags[iCj]:
-                PS += '{color} {x:<8.5f} {y:8<.5f} colorbox\n'.format(color=color_dict[iCj],
+                ps_body += '{color} {x:<8.5f} {y:8<.5f} colorbox\n'.format(color=color_dict[iCj],
                                                                  x=(-(i+1)+2*j)*scale,
                                                                  y=-i*scale*yscale)
-            else:# no-color
+            else:  # no-color
                 if print_no_color:
-                    PS += 'black {x:<8.5f} {y:8<.5f} nocolorbox\n'.format(x=(-(i+1)+2*j)*scale,
+                    ps_body += 'black {x:<8.5f} {y:8<.5f} nocolorbox\n'.format(x=(-(i+1)+2*j)*scale,
                                                                  y=-i*scale*yscale)
 
-    PS_foot = 'showpage'
-    return PS_head + PS + PS_foot
+    ps_foot = 'showpage'
+    return ps_head + ps_body + ps_foot
 
 
 if __name__ == '__main__':
@@ -242,7 +239,7 @@ if __name__ == '__main__':
     os.mkdir(out_directory)
     f = open(out_directory + '/' + file_name, 'w')
 
-    ps = Pascal_triangle_coloring(n, modulo,
+    ps = pascal_triangle_coloring(n, modulo,
                              shape=shape,
                              scale=0.5, yscale=3**0.5,
                              line_width=0.05,
