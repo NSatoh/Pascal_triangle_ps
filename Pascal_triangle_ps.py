@@ -1,5 +1,7 @@
 import os
 
+import color
+
 
 def gen_nCr_mod(n, modulo):
     """
@@ -21,42 +23,22 @@ def gen_nCr_mod(n, modulo):
     return nCr
 
 
-# -- color settings for PS -------------------------------------
-class PsColor:
-
-    _PS_COLOR_FORMAT = '/{name} {{{r} {g} {b} setrgbcolor }} def'
-
-    def __init__(self, name, r, g, b):
-        self.name = name
-        self.r = r
-        self.g = g
-        self.b = b
-
-    def as_ps_form(self):
-        return self._PS_COLOR_FORMAT.format(name=self.name,
-                                            r=self.r,
-                                            g=self.g,
-                                            b=self.b)
-
-RED         = PsColor(name='red', r=1, g=0, b=0)
-BLUE        = PsColor(name='blue', r=0, g=0, b=1)
-GREEN       = PsColor(name='green', r=0, g=1, b=0)
-MAGENTA     = PsColor(name='magenta', r=1, g=0, b=1)
-CYAN        = PsColor(name='cyan', r=0, g=1, b=1)
-YELLOW      = PsColor(name='yellow', r=1, g=1, b=0)
-HOTPINK     = PsColor(name='hotpink', r=1, g=0.412, b=0.706)
-TEAL        = PsColor(name='teal', r=0, g=0.5, b=0.5)
-FORESTGREEN = PsColor(name='forestgreen', r=0.133, g=0.545, b=0.133)
-DARKORCHID  = PsColor(name='darkorchid', r=0.6, g=0.196, b=0.8)
-SKYBLUE     = PsColor(name='skyblue', r=0.529, g=0.808, b=0.922)
-SLATEBLUE   = PsColor(name='slateblue', r=0, g=0.5, b=1)
-DARKORANGE  = PsColor(name='darkorange', r=1, g=0.549, b=0)
-BLACK       = PsColor(name='black',  r=0, g=0, b=0)
-GRAY80      = PsColor(name='gray80',  r=0.8, g=0.8, b=0.8)
-
-COLORS = [RED, GREEN, YELLOW, SLATEBLUE, GREEN, MAGENTA, CYAN,
-          HOTPINK, TEAL, FORESTGREEN, DARKORCHID, SKYBLUE,
-          BLACK]
+# -- color settings --------------------------------------------
+COLORS = [
+    color.RED,
+    color.GREEN,
+    color.YELLOW,
+    color.SLATEBLUE,
+    color.GREEN,
+    color.MAGENTA,
+    color.CYAN,
+    color.HOTPINK,
+    color.TEAL,
+    color.FORESTGREEN,
+    color.DARKORCHID,
+    color.SKYBLUE,
+    color.BLACK
+]
 
 
 def pascal_triangle_coloring(row, modulo,
@@ -76,7 +58,7 @@ def pascal_triangle_coloring(row, modulo,
     :param float scale:
     :param float yscale:
     :param float line_width:
-    :param list[PsColor] color_list: list of PsColors class objects
+    :param list[Color] color_list: list of Colors class objects
     :param list[bool] coloring_flags: list of booleans
     :param bool print_background_triangle: if True, fill the background
                                            by color #0, and set variable
@@ -251,7 +233,7 @@ if __name__ == '__main__':
                              line_width=0.05,
                              print_background_triangle=bg_flag,
                              #print_no_color=False,
-                             color_list=[BLACK]+COLORS,
+                             color_list=[color.BLACK]+COLORS,
                              coloring_flags=[False] + [True]*40,
                              print_sample=True
                                   )
