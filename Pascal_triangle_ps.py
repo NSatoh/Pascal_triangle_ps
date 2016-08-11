@@ -2,18 +2,19 @@ import os
 
 
 def gen_nCr_mod(n, modulo):
-    '''
-    @param int:  n
-    @param int:  modulo
+    """
+    Generate binary coefficient nCr
 
-    Generate binary coefficient nCr,
-    @return list: [[C(0,0)], [C(1,0), C(0,1)], ..., [C(n,0), C(n,1), ..., C(n,n)]]
+    :param int n:
+    :param int modulo:
+    :rtype: list[list[int]]
+    :return: [[C(0,0)], [C(1,0), C(0,1)], ..., [C(n,0), C(n,1), ..., C(n,n)]]
     (nCr = output, then nCr[n][r] is C(n,r) )
-    '''
+    """
     nCr = [[1]]
-    for i in range(1,n+1):
+    for i in range(1, n+1):
         iCr = [1]
-        for r in range(1,i):
+        for r in range(1, i):
             iCr += [(nCr[i-1][r-1] + nCr[i-1][r]) % modulo]
         iCr += [1]
         nCr += [iCr]
@@ -66,24 +67,28 @@ def pascal_triangle_coloring(row, modulo,
                              print_background_triangle=False,
                              print_no_color=True,
                              print_sample=True, sample_scale=10):
-    '''
-    @param int: row --> the number of rows of the triangle
-    @param int: modulo --> modulo for coloring
-    @param str: shape --> 'rectangle' or 'circle'
-    @param float: scale, yscale
-    @param float: line_width
-    @param list: color_list --> list of PsColors class objects
-    @param list: coloring_flags --> list of booleans
-    @param bool: print_background_triangle --> if True, fill the background
-                                               by color #0, and set variable
-                                               print_no_color = False
-                                               Automatically
-    @param bool: print_no_color --> if False, don't output no-color cell
-    @param bool: print_sample --> if True, output the color samples
-    @param int: sample_scale --> length of edge of the color sample rectangles
-
+    """
     Generate PS src
-    '''
+
+    :param int row: the number of rows of the triangle
+    :param int modulo: modulo for coloring
+    :param str shape: 'rectangle' or 'circle'
+    :param float scale:
+    :param float yscale:
+    :param float line_width:
+    :param list[PsColor] color_list: list of PsColors class objects
+    :param list[bool] coloring_flags: list of booleans
+    :param bool print_background_triangle: if True, fill the background
+                                           by color #0, and set variable
+                                           print_no_color = False
+                                           Automatically
+    :param bool print_no_color: if False, don't output no-color cell
+    :param bool print_sample: if True, output the color samples
+    :param int sample_scale: length of edge of the color sample rectangles
+    :rtype: str
+    :return: postscript source
+    """
+
     # postscript の仕様では, 1pt = 1/72 インチ
     # A4 だと, 0 < x < 595pt, 0 < y < 842pt くらい
     # そしてよくわからないが，座標では 左下(0,0) -- (501,709)右上 くらい
