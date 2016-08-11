@@ -1,3 +1,4 @@
+import os
 from time import clock
 
 def gen_nCr(n, debug=False):
@@ -267,9 +268,11 @@ if __name__ == '__main__':
         bg = '_bg'
     else:
         bg = ''
+    out_directory = './out'
     file_name = 'Pascal_triangle_mod{modulo}_{n}_{shape}{bg}.ps'.format(modulo=modulo, n=n,
                                                                         shape=shape, bg=bg)
-    f = open(file_name, 'w')
+    os.mkdir(out_directory)
+    f = open(out_directory + '/' + file_name, 'w')
 
     #ps = Pascal_triangle_coloring(600, 5,
     #                         #shape='rectangle',
