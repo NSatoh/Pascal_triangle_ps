@@ -1,39 +1,15 @@
 import os
-from time import clock
 
-def gen_nCr(n, debug=False):
-    '''
-    @param int:  n
-    @param bool: debug
 
-    Generate binary coefficient nCr,
-    @return list: [[C(0,0)], [C(1,0), C(0,1)], ..., [C(n,0), C(n,1), ..., C(n,n)]]
-    (nCr = output, then nCr[n][r] is C(n,r) )
-    '''
-    t1 = clock()
-    nCr = [[1]]
-    for i in range(1,n+1):
-        iCr = [1]
-        for r in range(1,i):
-            iCr += [nCr[i-1][r-1] + nCr[i-1][r]]
-        iCr += [1]
-        nCr += [iCr]
-    t2 = clock()
-    if debug:
-        print('time @gen_nCr({n}): {t}'.format(n=n,t=t2-t1))
-    return nCr
-
-def gen_nCr_mod(n, modulo, debug=False):
+def gen_nCr_mod(n, modulo):
     '''
     @param int:  n
     @param int:  modulo
-    @param bool: debug
 
     Generate binary coefficient nCr,
     @return list: [[C(0,0)], [C(1,0), C(0,1)], ..., [C(n,0), C(n,1), ..., C(n,n)]]
     (nCr = output, then nCr[n][r] is C(n,r) )
     '''
-    t1 = clock()
     nCr = [[1]]
     for i in range(1,n+1):
         iCr = [1]
@@ -41,15 +17,13 @@ def gen_nCr_mod(n, modulo, debug=False):
             iCr += [(nCr[i-1][r-1] + nCr[i-1][r]) % modulo]
         iCr += [1]
         nCr += [iCr]
-    t2 = clock()
-    if debug:
-        print('time @gen_nCr_mod({n},{mod}): {t}'.format(n=n,mod=modulo,t=t2-t1))
     return nCr
 
 
 #-- color settings for PS -------------------------------------
-COLOR_format = '/{name} {{{r} {g} {b} setrgbcolor }} def'
 class PsColor:
+
+    _PS_COLOR_FORMAT = '/{name} {{{r} {g} {b} setrgbcolor }} def'
 
     def __init__(self, name, r, g, b):
         self.name = name
@@ -58,10 +32,10 @@ class PsColor:
         self.b = b
 
     def PS_form(self):
-        return COLOR_format.format(name=self.name,
-                                   r=self.r,
-                                   g=self.g,
-                                   b=self.b)
+        return self._PS_COLOR_FORMAT.format(name=self.name,
+                                            r=self.r,
+                                            g=self.g,
+                                            b=self.b)
 
 RED     = PsColor(name='red',    r=1, g=0, b=0)
 BLUE    = PsColor(name='blue',   r=0, g=0, b=1)
@@ -77,12 +51,7 @@ SKYBLUE = PsColor(name='skyblue', r=0.529, g=0.808, b=0.922)
 SLATEBLUE = PsColor(name='slateblue', r=0, g=0.5, b=1)
 DARKORANGE = PsColor(name='darkorange', r=1, g=0.549, b=0)
 BLACK   = PsColor(name='black',  r=0, g=0, b=0)
-#GRAY   = PsColor(name='gray33',  r=0.33, g=0.33, b=0.33)
-GRAY   = PsColor(name='gray80',  r=0.8, g=0.8, b=0.8)
-
-#COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN,
-#          HOTPINK, TEAL, FORESTGREEN, DARKORCHID, SKYBLUE,
-#          BLACK]
+GRAY80   = PsColor(name='gray80',  r=0.8, g=0.8, b=0.8)
 
 COLORS = [RED, GREEN, YELLOW, SLATEBLUE, GREEN, MAGENTA, CYAN,
           HOTPINK, TEAL, FORESTGREEN, DARKORCHID, SKYBLUE,
@@ -171,10 +140,9 @@ def Pascal_triangle_coloring(row, modulo,
 
 
     PS  = 'newpath\n'
-    PS += '{lw} setlinewidth\n'.format(lw=line_width) 
-    # PS += '1 {yscale} scale\n'.format(yscale=yscale) # 線幅も影響を受けるのでよくない
+    PS += '{lw} setlinewidth\n'.format(lw=line_width)
     PS += '% 原点を, 大体紙の中央一番上へ移動\n'
-    PS += '250 700 translate\n'# 
+    PS += '250 700 translate\n'
 
     PS += '%****************** Pascal triangle -- {row} -- [color fill] ******************%\n'.format(row=row)
     PS += '% mod {modulo}\n'.format(modulo=modulo)
@@ -273,22 +241,6 @@ if __name__ == '__main__':
                                                                         shape=shape, bg=bg)
     os.mkdir(out_directory)
     f = open(out_directory + '/' + file_name, 'w')
-
-    #ps = Pascal_triangle_coloring(600, 5,
-    #                         #shape='rectangle',
-    #                         scale=0.2, yscale=1.73, line_width=0.1,
-    #                         color_list=[GRAY]+COLORS,
-    #                         coloring_flags=[True]*5
-    #                         #print_sample=True, sample_scale=10
-    #                              )
-
-    #ps = Pascal_triangle_coloring(600, 5,
-    #                         shape='circle',
-    #                         scale=0.2, yscale=1.73, line_width=0.1,
-    #                         color_list=[GRAY]+COLORS,
-    #                         coloring_flags=[True]*5
-    #                         #print_sample=True, sample_scale=10
-    #                              )
 
     ps = Pascal_triangle_coloring(n, modulo,
                              shape=shape,
