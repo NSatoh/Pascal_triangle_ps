@@ -43,12 +43,14 @@ COLORS = [
 
 def pascal_triangle_coloring(row, modulo,
                              shape='rectangle',
-                             scale=0.7, yscale=3**0.5, line_width=0.1,
+                             scale=0.7, yscale=3**0.5,
+                             line_width=0.1,
                              color_list=COLORS,
                              coloring_flags=[False] + [True]*12,
                              print_background_triangle=False,
                              print_no_color=True,
-                             print_sample=True, sample_scale=10):
+                             print_color_sample=True,
+                             sample_length=10):
     """
     Generate PostScript src
 
@@ -65,8 +67,8 @@ def pascal_triangle_coloring(row, modulo,
                                            print_no_color = False
                                            Automatically
     :param bool print_no_color: if False, don't output no-color cell
-    :param bool print_sample: if True, output the color samples
-    :param int sample_scale: length of edge of the color sample rectangles
+    :param bool print_color_sample: if True, output the color samples
+    :param int sample_length: length of edge of the color sample rectangles
     :rtype: str
     :return: PostScript source
     """
@@ -122,9 +124,9 @@ def pascal_triangle_coloring(row, modulo,
 
     ps_header += [
         '/colorsample {',
-        '  0 {s} rlineto'.format(s=sample_scale//2),
-        '  {ss} 0 rlineto'.format(ss=2*sample_scale),
-        '  0 -{s} rlineto'.format(s=sample_scale//2),
+        '  0 {s} rlineto'.format(s=sample_length // 2),
+        '  {ss} 0 rlineto'.format(ss=2 * sample_length),
+        '  0 -{s} rlineto'.format(s=sample_length // 2),
         '  fill',
         '} def'
     ]
@@ -135,56 +137,36 @@ def pascal_triangle_coloring(row, modulo,
         '{lw} setlinewidth'.format(lw=line_width),
         '% 原点を, 大体紙の中央一番上へ移動',
         '250 700 translate',
-        '%****************** Pascal triangle -- {row} -- [color fill] ******************%'.format(row=row),
+        '%****************** Pascal triangle -- {row} -- [color fill] ******************'.format(row=row),
         '% mod {modulo}'.format(modulo=modulo)
     ]
 
-    color_num = 0
-    color_dict = {}  # 直したい
-
-    if print_background_triangle:
-        color_name = color_list[color_num].name
-        ps_body += ['% background --> {color}'.format(color=color_name)]
-        color_dict['background'] = color_name
-        color_num += 1
+    ps_body += ['% print save mode --> {flag}'.format(flag=print_background_triangle)]
 
     for r in range(modulo):
-        if coloring_flags[r]:
-            color_name = color_list[color_num].name
-            ps_body += ['% {r} --> {color}'.format(r=r, color=color_name)]
-            color_dict[r] = color_name
-            color_num += 1
-        else:
-            if print_background_triangle:
-                ps_body += ['% {r} --> background'.format(r=r)]
-            else:
-                ps_body += ['% {r} --> no-color'.format(r=r)]
+        color_name = color_list[r].name if coloring_flags[r] else 'no-color'
+        ps_body += ['% {r} --> {color}'.format(r=r, color=color_name)]
 
-    if print_sample:
+    if print_color_sample:
         ps_body += ['% -- color sample ---------------']
-        ps_body += ['/Times-Roman findfont {s} scalefont setfont'.format(s=int(sample_scale*0.6))]
-        x = row*scale + sample_scale
+        ps_body += ['/Times-Roman findfont {s} scalefont setfont'.format(s=int(sample_length * 0.6))]
+        x = row*scale + sample_length
         y = 0
         for r in range(modulo):
-            if coloring_flags[r]:
-                ps_body += [
-                    'black {x} {y} moveto (:{r}) show'.format(x=x + 2 * sample_scale, y=y, r=r),
-                    '{color} {x} {y} moveto colorsample'.format(color=color_dict[r], x=x, y=y)
-                ]
-                y -= sample_scale
-            elif print_background_triangle:
-                ps_body += [
-                    'black {x} {y} moveto (:{r}) show'.format(x=x + 2 * sample_scale, y=y, r=r),
-                    '{color} {x} {y} moveto colorsample'.format(color=color_dict['background'], x=x, y=y)
-                ]
-                y -= sample_scale
+            ps_body += [
+                'black {x} {y} moveto (:{r}) show'.format(x=x + 2 * sample_length, y=y, r=r),
+                '{color} {x} {y} moveto colorsample'.format(color=color_list[r].name, x=x, y=y)
+            ]
+            y -= sample_length
 
     if print_background_triangle:
+        remainder0_color_number = 0
         print_no_color = False  # auto setting
+
         i, j = 0, 0
         ps_body += [
             '{color} {x:<8.5f} {y:8<.5f} moveto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale,
-                                                        color=color_dict['background'])
+                                                        color=color_list[remainder0_color_number].name)
         ]
 
         i, j = row-1, 0
@@ -203,7 +185,7 @@ def pascal_triangle_coloring(row, modulo,
             if coloring_flags[iCj]:
                 ps_body += [
                     '{color} {x:<8.5f} {y:8<.5f} colorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale,
-                                                                    color=color_dict[iCj])
+                                                                  color=color_list[iCj].name)
                 ]
             else:  # no-color
                 if print_no_color:
@@ -240,7 +222,7 @@ if __name__ == '__main__':
                                   #print_no_color=False,
                                   color_list=[color.BLACK]+COLORS,
                                   coloring_flags=[False] + [True]*40,
-                                  print_sample=True
+                                  print_color_sample=True
                                   )
 
     f.write(ps)
