@@ -73,6 +73,9 @@ def pascal_triangle_coloring(row, modulo,
     :return: PostScript source
     """
 
+    if print_background_triangle:
+        print_no_color = False  # auto setting
+
     # postscript の仕様では, 1pt = 1/72 インチ
     # A4 だと, 0 < x < 595pt, 0 < y < 842pt くらい
     # そしてよくわからないが，座標では 左下(0,0) -- (501,709)右上 くらい
@@ -161,7 +164,6 @@ def pascal_triangle_coloring(row, modulo,
 
     if print_background_triangle:
         remainder0_color_number = 0
-        print_no_color = False  # auto setting
 
         i, j = 0, 0
         ps_body += [
