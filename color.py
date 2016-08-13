@@ -12,14 +12,6 @@ class Color:
         self.g = g
         self.b = b
 
-    def as_ps_form(self):
-        """
-        :rtype: str
-        :return:
-        """
-        ps_form = '/{name} {{{r} {g} {b} setrgbcolor }} def'
-        return ps_form.format(name=self.name, r=self.r, g=self.g, b=self.b)
-
 
 RED         = Color(name='red', r=1, g=0, b=0)
 BLUE        = Color(name='blue', r=0, g=0, b=1)

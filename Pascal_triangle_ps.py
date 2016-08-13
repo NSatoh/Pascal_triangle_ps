@@ -1,6 +1,7 @@
 import os
 
 import color
+import postscript
 
 
 def gen_nCr_mod(n, modulo):
@@ -76,108 +77,103 @@ def pascal_triangle_coloring(row, modulo,
     if print_background_triangle:
         print_no_color = False  # auto setting
 
+    ps = postscript.PostScript()
+
     # postscript の仕様では, 1pt = 1/72 インチ
     # A4 だと, 0 < x < 595pt, 0 < y < 842pt くらい
     # そしてよくわからないが，座標では 左下(0,0) -- (501,709)右上 くらい
-    ps_header = [
-        '%!PS-Adobe-3.0',
-        '/mm { 2.834646 mul } def  % inch -> mm'
-    ]
+    ps.header.comment('inch -> mm')
+    ps.header.definition('mm', '2.834646 mul')
 
-    ps_header += [c.as_ps_form() for c in color_list]
+    for c in color_list:
+        ps.header.color_definition(c)
 
     if shape is 'rectangle':
-        ps_header += [
-            '/colorbox {',
-            '  %-- rectangle --',
+        ps.header.definition('colorbox', '\n'.join([
+            '',
             '  moveto',
             '  0 {s} rlineto'.format(s=scale * yscale),
             '  {ss} 0 rlineto'.format(ss=2 * scale),
             '  0 -{s} rlineto'.format(s=scale * yscale),
             '  fill',
-            '} def'
-        ]
-        ps_header += [
-            '/nocolorbox {',
-            '  %-- rectangle --',
+            '',
+        ]))
+        ps.header.definition('nocolorbox', '\n'.join([
+            '',
             '  moveto',
             '  0 {s} rlineto'.format(s=scale * yscale),
             '  {ss} 0 rlineto'.format(ss=2 * scale),
             '  0 -{s} rlineto'.format(s=scale * yscale),
             '  stroke',
-            '} def'
-        ]
+            '',
+        ]))
     elif shape is 'circle':
-        ps_header += [
-            '/colorbox {',
-            '  %-- circle --',
+        ps.header.definition('colorbox', '\n'.join([
+            '',
             '  {s} 0 360 arc'.format(s=scale),
             '  fill',
-            '} def'
-        ]
-        ps_header += [
-            '/nocolorbox {',
-            '  %-- circle --',
+            '',
+        ]))
+        ps.header.definition('nocolorbox', '\n'.join([
+            '',
             '  {s} 0 360 arc'.format(s=scale),
             '  stroke',
-            '} def'
-        ]
+            '',
+        ]))
     else:
         pass
 
-    ps_header += [
-        '/colorsample {',
+    ps.header.definition('colorsample', '\n'.join([
+        '',
         '  0 {s} rlineto'.format(s=sample_length // 2),
         '  {ss} 0 rlineto'.format(ss=2 * sample_length),
         '  0 -{s} rlineto'.format(s=sample_length // 2),
         '  fill',
-        '} def'
-    ]
+        '',
+    ]))
 
-    ps_body = []
-    ps_body += [
-        'newpath',
-        '{lw} setlinewidth'.format(lw=line_width),
-        '% 原点を, 大体紙の中央一番上へ移動',
-        '250 700 translate',
-        '%****************** Pascal triangle -- {row} -- [color fill] ******************'.format(row=row),
-        '% mod {modulo}'.format(modulo=modulo)
-    ]
+    ps.body.new_path()
+    ps.body.set_line_width(line_width)
 
-    ps_body += ['% print save mode --> {flag}'.format(flag=print_background_triangle)]
+    ps.body.comment('原点を, 大体紙の中央一番上へ移動')
+    ps.body.translate(250, 700)
+
+    ps.body.comment('****************** Pascal triangle -- {row} -- [color fill] ******************'.format(row=row))
+    ps.body.comment('mod {modulo}'.format(modulo=modulo))
+    ps.body.comment('print save mode --> {flag}'.format(flag=print_background_triangle))
 
     for r in range(modulo):
         color_name = color_list[r].name if coloring_flags[r] else 'no-color'
-        ps_body += ['% {r} --> {color}'.format(r=r, color=color_name)]
+        ps.body.comment('{r} --> {color}'.format(r=r, color=color_name))
 
     if print_color_sample:
-        ps_body += ['% -- color sample ---------------']
-        ps_body += ['/Times-Roman findfont {s} scalefont setfont'.format(s=int(sample_length * 0.6))]
+        ps.body.comment('-- color sample ---------------')
+        ps.body.set_font('Times-Roman', point=int(sample_length * 0.6))
+
         x = row*scale + sample_length
         y = 0
         for r in range(modulo):
-            ps_body += [
-                'black {x} {y} moveto (:{r}) show'.format(x=x + 2 * sample_length, y=y, r=r),
-                '{color} {x} {y} moveto colorsample'.format(color=color_list[r].name, x=x, y=y)
-            ]
+            ps.body.set_color(color.BLACK)
+            ps.body.draw_string(x=x + 2*sample_length, y=y, string=':{r}'.format(r=r))
+            ps.body.set_color(color_list[r])
+            ps.body.move_to(x, y)
+            ps.body.append_content('colorsample')
             y -= sample_length
 
     if print_background_triangle:
         remainder0_color_number = 0
 
         i, j = 0, 0
-        ps_body += [
-            '{color} {x:<8.5f} {y:8<.5f} moveto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale,
-                                                        color=color_list[remainder0_color_number].name)
-        ]
+        ps.body.set_color(color_list[remainder0_color_number])
+        ps.body.append_content('{x:<8.5f} {y:8<.5f} moveto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
 
         i, j = row-1, 0
-        ps_body += ['{x:<8.5f} {y:8<.5f} lineto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale)]
+        ps.body.append_content('{x:<8.5f} {y:8<.5f} lineto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
 
         i, j = row-1, row-1
-        ps_body += ['{x:<8.5f} {y:8<.5f} lineto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale)]
+        ps.body.append_content('{x:<8.5f} {y:8<.5f} lineto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
 
-        ps_body += ['fill']
+        ps.body.append_content('fill')
 
     nCr = gen_nCr_mod(row, modulo)
 
@@ -185,19 +181,16 @@ def pascal_triangle_coloring(row, modulo,
         for j in range(i+1):
             iCj = nCr[i][j]
             if coloring_flags[iCj]:
-                ps_body += [
-                    '{color} {x:<8.5f} {y:8<.5f} colorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale,
-                                                                  color=color_list[iCj].name)
-                ]
+                ps.body.set_color(color_list[iCj])
+                ps.body.append_content('{x:<8.5f} {y:8<.5f} colorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
             else:  # no-color
                 if print_no_color:
-                    ps_body += [
-                        'black {x:<8.5f} {y:8<.5f} nocolorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale)
-                    ]
+                    ps.body.set_color(color.BLACK)
+                    ps.body.append_content('{x:<8.5f} {y:8<.5f} nocolorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
 
-    ps_footer = ['showpage']
+    ps.footer.show_page()
 
-    return "\n".join(ps_header + ps_body + ps_footer)
+    return ps.get_source()
 
 
 if __name__ == '__main__':
@@ -216,18 +209,18 @@ if __name__ == '__main__':
         os.mkdir(out_directory)
     f = open(out_directory + '/' + file_name, 'w')
 
-    ps = pascal_triangle_coloring(n, modulo,
-                                  shape=shape,
-                                  scale=0.5, yscale=3**0.5,
-                                  line_width=0.05,
-                                  print_background_triangle=bg_flag,
-                                  #print_no_color=False,
-                                  color_list=[color.BLACK]+COLORS,
-                                  coloring_flags=[False] + [True]*40,
-                                  print_color_sample=True
-                                  )
+    ps_src = pascal_triangle_coloring(n, modulo,
+                                      shape=shape,
+                                      scale=0.5, yscale=3**0.5,
+                                      line_width=0.05,
+                                      print_background_triangle=bg_flag,
+                                      #print_no_color=False,
+                                      color_list=[color.BLACK]+COLORS,
+                                      coloring_flags=[False] + [True]*40,
+                                      print_color_sample=True
+                                      )
 
-    f.write(ps)
+    f.write(ps_src)
     f.close()
 
     print('success')
