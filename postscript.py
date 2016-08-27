@@ -44,7 +44,7 @@ class PostScriptContent:
 
     def call(self, key):
         """
-        append `call defined value` command
+        append `call defined object` command
 
         :param str key:
         :rtype: PostScriptContent
@@ -124,6 +124,7 @@ class PostScriptContent:
         :param int|float x:
         :param int|float y:
         :param str string:
+        :rtype: PostScriptContent
         :return:
         """
         return self.append_content([
@@ -137,12 +138,30 @@ class PostScriptContent:
 
         :param int|float width:
         :param int|float height:
+        :rtype: PostScriptContent
         :return:
         """
         return self.append_content([
             cmd.r_line_to(width, 0),
             cmd.r_line_to(0, height),
             cmd.r_line_to(-width, 0),
+            cmd.fill()
+        ])
+
+    def fill_triangle(self, v1, v2, v3):
+        """
+        append `fill triangle` command
+
+        :param (int|float, int|float) v1: vertex coordinate (x, y)
+        :param (int|float, int|float) v2: vertex coordinate (x, y)
+        :param (int|float, int|float) v3: vertex coordinate (x, y)
+        :rtype: PostScriptContent
+        :return:
+        """
+        return self.append_content([
+            cmd.move_to(v1[0], v1[1]),
+            cmd.line_to(v2[0], v2[1]),
+            cmd.line_to(v3[0], v3[1]),
             cmd.fill()
         ])
 

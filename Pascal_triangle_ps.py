@@ -154,29 +154,37 @@ def pascal_triangle_coloring(row, modulo,
         remainder0_color_number = 0
 
         i, j = 0, 0
-        ps.body.set_color(color_list[remainder0_color_number])
-        ps.body.append_content('{x:<8.5f} {y:8<.5f} moveto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
+        x = (-(i+1) + 2*j) * scale
+        y = -i * scale * yscale
+        triangle_vertex1 = (round(x, 5), round(y, 5))
 
         i, j = row-1, 0
-        ps.body.append_content('{x:<8.5f} {y:8<.5f} lineto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
+        x = (-(i+1) + 2*j) * scale
+        y = -i * scale * yscale
+        triangle_vertex2 = (round(x, 5), round(y, 5))
 
         i, j = row-1, row-1
-        ps.body.append_content('{x:<8.5f} {y:8<.5f} lineto'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
+        x = (-(i+1) + 2*j) * scale
+        y = -i * scale * yscale
+        triangle_vertex3 = (round(x, 5), round(y, 5))
 
-        ps.body.append_content('fill')
+        ps.body.set_color(color_list[remainder0_color_number])
+        ps.body.fill_triangle(triangle_vertex1, triangle_vertex2, triangle_vertex3)
 
     nCr = gen_nCr_mod(row, modulo)
 
     for i in range(row):
         for j in range(i+1):
             iCj = nCr[i][j]
+            x = (-(i+1) + 2*j) * scale
+            y = -i * scale * yscale
             if coloring_flags[iCj]:
                 ps.body.set_color(color_list[iCj])
-                ps.body.append_content('{x:<8.5f} {y:8<.5f} colorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
+                ps.body.append_content('{x} {y} colorbox'.format(x=round(x, 5), y=round(y, 5)))
             else:  # no-color
                 if print_no_color:
                     ps.body.set_color(color.BLACK)
-                    ps.body.append_content('{x:<8.5f} {y:8<.5f} nocolorbox'.format(x=(-(i+1)+2*j)*scale, y=-i*scale*yscale))
+                    ps.body.append_content('{x} {y} nocolorbox'.format(x=round(x, 5), y=round(y, 5)))
 
     ps.footer.show_page()
 
