@@ -62,7 +62,6 @@ class PostScriptContent:
         """
         return self.append_content(cmd.set_line_width(width))
 
-    # TODO: 必要かどうか
     def move_to(self, x, y):
         """
         append `move to` command
