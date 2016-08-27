@@ -7,7 +7,7 @@ def comment(content):
     return '% ' + content
 
 
-def definition(key, value):
+def define_value(key, value):
     """
     :param str key:
     :param str|int|float value:
@@ -15,6 +15,27 @@ def definition(key, value):
     :return:
     """
     return '/{key} {{{value}}} def'.format(key=key, value=value)
+
+
+def define_procedure(key, procedure_lines):
+    """
+    :param str key:
+    :param list[str] procedure_lines:
+    :rtype: str
+    :return:
+    """
+
+    def indent(line):
+        """
+        :param str line:
+        :rtype: str
+        :return:
+        """
+        amount = 2
+        return (' ' * amount) + line
+
+    indented_lines = map(indent, procedure_lines)
+    return '/{key} {{\n{procedure}\n}} def'.format(key=key, procedure='\n'.join(indented_lines))
 
 
 def set_line_width(width):

@@ -35,11 +35,22 @@ class PostScriptContent:
         append definition command
 
         :param str key:
-        :param str|int|float value:
+        :param str|int|float|list[str] value:
         :rtype: PostScriptContent
         :return:
         """
-        return self.append_content(cmd.definition(key, value))
+        definition_cmd = cmd.define_procedure if isinstance(value, list) else cmd.define_value
+        return self.append_content(definition_cmd(key, value))
+
+    def call(self, key):
+        """
+        append `call defined value` command
+
+        :param str key:
+        :rtype: PostScriptContent
+        :return:
+        """
+        return self.append_content(key)
 
     def set_line_width(self, width):
         """
@@ -108,7 +119,7 @@ class PostScriptContent:
 
     def draw_string(self, x, y, string):
         """
-        append `draw string` command(macro)
+        append `draw string` command
 
         :param int|float x:
         :param int|float y:
@@ -118,6 +129,21 @@ class PostScriptContent:
         return self.append_content([
             cmd.move_to(x, y),
             cmd.show(string)
+        ])
+
+    def fill_rectangle(self, width, height):
+        """
+        append `fill rectangle` command
+
+        :param int|float width:
+        :param int|float height:
+        :return:
+        """
+        return self.append_content([
+            cmd.r_line_to(width, 0),
+            cmd.r_line_to(0, height),
+            cmd.r_line_to(-width, 0),
+            cmd.fill()
         ])
 
     def new_path(self):

@@ -89,48 +89,38 @@ def pascal_triangle_coloring(row, modulo,
         ps.header.color_definition(c)
 
     if shape is 'rectangle':
-        ps.header.definition('colorbox', '\n'.join([
-            '',
-            '  moveto',
-            '  0 {s} rlineto'.format(s=scale * yscale),
-            '  {ss} 0 rlineto'.format(ss=2 * scale),
-            '  0 -{s} rlineto'.format(s=scale * yscale),
-            '  fill',
-            '',
-        ]))
-        ps.header.definition('nocolorbox', '\n'.join([
-            '',
-            '  moveto',
-            '  0 {s} rlineto'.format(s=scale * yscale),
-            '  {ss} 0 rlineto'.format(ss=2 * scale),
-            '  0 -{s} rlineto'.format(s=scale * yscale),
-            '  stroke',
-            '',
-        ]))
+        ps.header.definition('colorbox', [
+            'moveto',
+            '0 {s} rlineto'.format(s=scale * yscale),
+            '{ss} 0 rlineto'.format(ss=2 * scale),
+            '0 -{s} rlineto'.format(s=scale * yscale),
+            'fill',
+        ])
+        ps.header.definition('nocolorbox', [
+            'moveto',
+            '0 {s} rlineto'.format(s=scale * yscale),
+            '{ss} 0 rlineto'.format(ss=2 * scale),
+            '0 -{s} rlineto'.format(s=scale * yscale),
+            'stroke',
+        ])
     elif shape is 'circle':
-        ps.header.definition('colorbox', '\n'.join([
-            '',
-            '  {s} 0 360 arc'.format(s=scale),
-            '  fill',
-            '',
-        ]))
-        ps.header.definition('nocolorbox', '\n'.join([
-            '',
-            '  {s} 0 360 arc'.format(s=scale),
-            '  stroke',
-            '',
-        ]))
+        ps.header.definition('colorbox', [
+            '{s} 0 360 arc'.format(s=scale),
+            'fill',
+        ])
+        ps.header.definition('nocolorbox', [
+            '{s} 0 360 arc'.format(s=scale),
+            'stroke',
+        ])
     else:
         pass
 
-    ps.header.definition('colorsample', '\n'.join([
-        '',
-        '  0 {s} rlineto'.format(s=sample_length // 2),
-        '  {ss} 0 rlineto'.format(ss=2 * sample_length),
-        '  0 -{s} rlineto'.format(s=sample_length // 2),
-        '  fill',
-        '',
-    ]))
+    ps.header.definition('colorsample', [
+        '0 {s} rlineto'.format(s=sample_length // 2),
+        '{ss} 0 rlineto'.format(ss=2 * sample_length),
+        '0 -{s} rlineto'.format(s=sample_length // 2),
+        'fill'
+    ])
 
     ps.body.new_path()
     ps.body.set_line_width(line_width)
@@ -157,7 +147,7 @@ def pascal_triangle_coloring(row, modulo,
             ps.body.draw_string(x=x + 2*sample_length, y=y, string=':{r}'.format(r=r))
             ps.body.set_color(color_list[r])
             ps.body.move_to(x, y)
-            ps.body.append_content('colorsample')
+            ps.body.call('colorsample')
             y -= sample_length
 
     if print_background_triangle:
