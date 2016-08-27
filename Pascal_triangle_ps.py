@@ -94,23 +94,23 @@ def pascal_triangle_coloring(row, modulo,
             '0 {s} rlineto'.format(s=scale * yscale),
             '{ss} 0 rlineto'.format(ss=2 * scale),
             '0 -{s} rlineto'.format(s=scale * yscale),
-            'fill',
+            'fill'
         ])
         ps.header.definition('nocolorbox', [
             'moveto',
             '0 {s} rlineto'.format(s=scale * yscale),
             '{ss} 0 rlineto'.format(ss=2 * scale),
             '0 -{s} rlineto'.format(s=scale * yscale),
-            'stroke',
+            'stroke'
         ])
     elif shape is 'circle':
         ps.header.definition('colorbox', [
             '{s} 0 360 arc'.format(s=scale),
-            'fill',
+            'fill'
         ])
         ps.header.definition('nocolorbox', [
             '{s} 0 360 arc'.format(s=scale),
-            'stroke',
+            'stroke'
         ])
     else:
         pass
