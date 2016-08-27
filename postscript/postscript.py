@@ -1,4 +1,4 @@
-import postscript_command as cmd
+from . import postscript_command as cmd
 
 
 class PostScriptContent:
